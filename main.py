@@ -1,34 +1,24 @@
-#!/usr/bin/env python3
-"""make.fun entry point for "world-news-2026-11-18".
-
-Copies the pre-rendered ``entry.png`` from this repository to
-``/output/entry.png``.  Standard library only, no network, deterministic.
-"""
-
-from __future__ import annotations
+"""Copy entry.png to the output directory specified by MAKEFUN_OUTPUT_DIR or /output."""
 
 import os
 import shutil
 import sys
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-SOURCE = os.path.join(HERE, "entry.png")
-OUTPUT_DIR = "/output"
-DEST = os.path.join(OUTPUT_DIR, "entry.png")
 
+def main():
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    source = os.path.join(script_dir, "entry.png")
 
-def main() -> int:
-    if not os.path.isfile(SOURCE):
-        print(f"error: missing {SOURCE}", file=sys.stderr)
-        return 1
+    if not os.path.isfile(source):
+        sys.stderr.write(f"Error: source image not found at {source}\n")
+        sys.exit(1)
 
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    shutil.copyfile(SOURCE, DEST)
+    output_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "").strip() or "/output"
+    os.makedirs(output_dir, exist_ok=True)
 
-    written = os.path.getsize(DEST)
-    print(f"wrote {written} bytes to {DEST}")
-    return 0
+    dest = os.path.join(output_dir, "entry.png")
+    shutil.copy2(source, dest)
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()
